@@ -10,6 +10,7 @@ $kategori_list = get_app_categories($conn);
     <title>Add Product | Lumoo Admin</title>
     <link rel="stylesheet" type="text/css" href="styleadmin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="wrapper">
@@ -76,7 +77,7 @@ $kategori_list = get_app_categories($conn);
                 <?php
                 if (isset($_POST['submit'])) {
                     if (!$conn) {
-                        echo '<script>alert("Notice: Database cloud belum terhubung. Mode pratinjau aktif."); window.location="produk_data.php";</script>';
+                        header('Location: produk_data.php?notif=demo_mode');
                         exit;
                     }
 
@@ -107,8 +108,8 @@ $kategori_list = get_app_categories($conn);
                         mysqli_stmt_bind_param($stmt, 'isissi', $kategori, $nama, $harga, $deskripsi, $newname, $status);
 
                         if (mysqli_stmt_execute($stmt)) {
-                            echo '<script>alert("Data added successfully")</script>';
-                            echo '<script>window.location="produk_data.php"</script>';
+                            header('Location: produk_data.php?notif=tambah_sukses');
+                            exit;
                         } else {
                             echo 'failed ' . htmlspecialchars(mysqli_error($conn));
                         }

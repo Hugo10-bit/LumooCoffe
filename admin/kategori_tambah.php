@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styleadmin.css">
     <title>Add Category | Lumoo Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="wrapper">
@@ -44,7 +45,7 @@
                         $nama = ucwords(trim($_POST['nama']));
 
                         if (!$conn) {
-                            echo '<script>alert("Notice: Database cloud belum terhubung. Mode pratinjau aktif."); window.location="kategori_data.php";</script>';
+                            header('Location: kategori_data.php?notif=demo_mode');
                             exit;
                         }
 
@@ -52,8 +53,8 @@
                         mysqli_stmt_bind_param($stmt, 's', $nama);
 
                         if(mysqli_stmt_execute($stmt)){
-                            echo '<script>alert("Data added successfully")</script>';
-                            echo '<script>window.location="kategori_data.php"</script>';
+                            header('Location: kategori_data.php?notif=tambah_sukses');
+                            exit;
                         }else{
                             echo 'failed '.htmlspecialchars(mysqli_error($conn));
                         }

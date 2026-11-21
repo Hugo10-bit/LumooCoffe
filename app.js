@@ -213,11 +213,229 @@
     });
   }
 
+  function initNotifications() {
+    if (typeof Swal === 'undefined') return;
+
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3500,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer);
+        toast.addEventListener('mouseleave', Swal.resumeTimer);
+      }
+    });
+
+    // 1. Check URL query parameters for feedback notifications
+    const params = new URLSearchParams(window.location.search);
+    const notif = params.get('notif');
+    const pesan = params.get('pesan');
+
+    if (notif === 'edit_sukses') {
+      Toast.fire({
+        icon: 'success',
+        title: 'Perubahan data berhasil disimpan! ✨'
+      });
+    } else if (notif === 'tambah_sukses') {
+      Toast.fire({
+        icon: 'success',
+        title: 'Data baru berhasil ditambahkan! 🎉'
+      });
+    } else if (notif === 'hapus_sukses') {
+      Toast.fire({
+        icon: 'success',
+        title: 'Data berhasil dihapus! 🗑️'
+      });
+    } else if (notif === 'password_sukses') {
+      Toast.fire({
+        icon: 'success',
+        title: 'Password akun berhasil diperbarui! 🔒'
+      });
+    } else if (notif === 'demo_mode') {
+      Swal.fire({
+        icon: 'info',
+        title: 'Mode Demo Cloud Aktif',
+        text: 'Database belum terhubung ke cloud. Aksi disimulasikan pada sesi saat ini.',
+        confirmButtonColor: '#382814',
+        confirmButtonText: 'Mengerti'
+      });
+    }
+
+    if (pesan === 'logout') {
+      Swal.fire({
+        icon: 'info',
+        title: 'Berhasil Logout',
+        text: 'Anda telah berhasil keluar dari akun. Silakan login kembali.',
+        confirmButtonColor: '#382814',
+        confirmButtonText: 'OK'
+      });
+    } else if (pesan === 'login') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Sesi Diperlukan',
+        text: 'Sesi Anda telah berakhir atau Anda belum login. Silakan masuk terlebih dahulu.',
+        confirmButtonColor: '#382814',
+        confirmButtonText: 'Masuk Sekarang'
+      });
+    } else if (pesan === 'registered') {
+      Swal.fire({
+        icon: 'success',
+        title: 'Registrasi Berhasil',
+        text: 'Akun Anda berhasil didaftarkan! Silakan login untuk melanjutkan.',
+        confirmButtonColor: '#382814',
+        confirmButtonText: 'Login Sekarang'
+      });
+    }
+
+    // Clean up URL params so refreshing doesn't replay alerts
+    if (notif || pesan) {
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+
+    // 2. Global event delegation for Logout links
+    document.addEventListener('click', (e) => {
+      const logoutLink = e.target.closest('a[href*="logout"]');
+      if (logoutLink) {
+        e.preventDefault();
+        const targetUrl = logoutLink.getAttribute('href');
+        Swal.fire({
+          title: 'Konfirmasi Logout',
+          text: 'Apakah Anda yakin ingin keluar? Anda harus login kembali untuk mengakses akun.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#382814',
+          cancelButtonColor: '#9ca3af',
+          confirmButtonText: '<i class="fas fa-sign-out-alt"></i> Ya, Logout',
+          cancelButtonText: 'Batal',
+          reverseButtons: true,
+          focusCancel: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = targetUrl;
+          }
+        });
+        return;
+      }
+
+      // 3. Global event delegation for Hapus (Delete) links
+      const deleteLink = e.target.closest('a[href*="hapus_proses"], a.delete, a.delete-btn');
+      if (deleteLink) {
+        e.preventDefault();
+        const targetUrl = deleteLink.getAttribute('href');
+        const row = deleteLink.closest('tr') || deleteLink.closest('.message-card');
+        let itemName = '';
+        if (row) {
+          const nameEl = row.querySelector('strong') || row.querySelector('.cat-name-highlight') || row.querySelector('.msg-sender');
+          if (nameEl) itemName = nameEl.innerText.trim();
+        }
+
+        Swal.fire({
+          title: 'Konfirmasi Hapus Data',
+          html: itemName 
+            ? 'Apakah Anda yakin ingin menghapus <strong>"' + itemName + '"</strong>?<br><span style="color:#ef4444; font-size:13px; font-weight:600;"><i class="fas fa-exclamation-triangle"></i> Tindakan ini tidak dapat dibatalkan!</span>'
+            : 'Apakah Anda yakin ingin menghapus data ini?<br><span style="color:#ef4444; font-size:13px; font-weight:600;"><i class="fas fa-exclamation-triangle"></i> Tindakan ini tidak dapat dibatalkan!</span>',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc2626',
+          cancelButtonColor: '#9ca3af',
+          confirmButtonText: '<i class="fas fa-trash-alt"></i> Ya, Hapus Data',
+          cancelButtonText: 'Batal',
+          reverseButtons: true,
+          focusCancel: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = targetUrl;
+          }
+        });
+        return;
+      }
+
+      // 4. Global event delegation for Toggle Best Seller
+      const bsToggle = e.target.closest('a[href*="toggle_bs"]');
+      if (bsToggle) {
+        e.preventDefault();
+        const targetUrl = bsToggle.getAttribute('href');
+        const isCurrentlyBS = bsToggle.classList.contains('bs-on');
+        const title = isCurrentlyBS ? 'Lepas Best Seller?' : 'Jadikan Best Seller?';
+        const text = isCurrentlyBS 
+          ? 'Produk ini tidak akan lagi ditampilkan pada slot Best Seller di beranda.'
+          : 'Produk ini akan disorot pada slot Best Seller di beranda kafe.';
+
+        Swal.fire({
+          title: title,
+          text: text,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#d97706',
+          cancelButtonColor: '#9ca3af',
+          confirmButtonText: isCurrentlyBS ? 'Ya, Lepas Status' : 'Ya, Jadikan Best Seller',
+          cancelButtonText: 'Batal',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = targetUrl;
+          }
+        });
+        return;
+      }
+    });
+
+    // 5. Intercept Form Submit on Edit / Profile forms
+    document.querySelectorAll('form').forEach((form) => {
+      const h3 = form.querySelector('h3');
+      if (!h3) return;
+      const title = h3.innerText.toLowerCase();
+      const isEdit = title.includes('edit') || title.includes('profile') || title.includes('password');
+      if (!isEdit) return;
+
+      form.addEventListener('submit', function (e) {
+        if (form.dataset.confirmed === 'true') return;
+
+        e.preventDefault();
+        const isPw = title.includes('password');
+        const confirmTitle = isPw ? 'Ubah Password Akun?' : 'Simpan Perubahan Data?';
+        const confirmText = isPw 
+          ? 'Pastikan Anda mengingat password baru yang dimasukkan.' 
+          : 'Apakah data perubahan yang Anda masukkan sudah benar?';
+
+        Swal.fire({
+          title: confirmTitle,
+          text: confirmText,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#382814',
+          cancelButtonColor: '#9ca3af',
+          confirmButtonText: '<i class="fas fa-check"></i> Ya, Simpan',
+          cancelButtonText: 'Periksa Lagi',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            form.dataset.confirmed = 'true';
+            // Find submit button to preserve its name in POST
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn && submitBtn.name) {
+              const hidden = document.createElement('input');
+              hidden.type = 'hidden';
+              hidden.name = submitBtn.name;
+              hidden.value = '1';
+              form.appendChild(hidden);
+            }
+            form.submit();
+          }
+        });
+      });
+    });
+  }
+
   function init() {
     initScrollReveal();
     initNavbar();
     initMenuUrlFilter();
     initAdminSidebar();
+    initNotifications();
   }
 
   // Jika halaman dipulihkan dari back-forward cache (mis. tekan Back setelah logout),

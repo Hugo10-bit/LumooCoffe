@@ -3,7 +3,15 @@
 include 'session.php';
 
 if (!$conn) {
-    echo '<script>alert("Notice: Database cloud belum terhubung. Penghapusan data tidak dapat diproses dalam mode demo."); window.history.back();</script>';
+    if (isset($_GET['idk'])) {
+        header('Location: kategori_data.php?notif=demo_mode');
+    } elseif (isset($_GET['idp'])) {
+        header('Location: produk_data.php?notif=demo_mode');
+    } elseif (isset($_GET['idc'])) {
+        header('Location: message.php?notif=demo_mode');
+    } else {
+        header('Location: dashboard.php?notif=demo_mode');
+    }
     exit;
 }
 
@@ -13,7 +21,7 @@ if (isset($_GET['idk'])) {
     $stmt = mysqli_prepare($conn, "DELETE FROM tb_category WHERE category_id = ?");
     mysqli_stmt_bind_param($stmt, 'i', $id);
     mysqli_stmt_execute($stmt);
-    header('Location: kategori_data.php');
+    header('Location: kategori_data.php?notif=hapus_sukses');
     exit;
 }
 
@@ -36,7 +44,7 @@ if (isset($_GET['idp'])) {
     $del = mysqli_prepare($conn, "DELETE FROM tb_product WHERE product_id = ?");
     mysqli_stmt_bind_param($del, 'i', $id);
     mysqli_stmt_execute($del);
-    header('Location: produk_data.php');
+    header('Location: produk_data.php?notif=hapus_sukses');
     exit;
 }
 
@@ -46,7 +54,7 @@ if (isset($_GET['idc'])) {
     $stmt = mysqli_prepare($conn, "DELETE FROM tb_message WHERE id = ?");
     mysqli_stmt_bind_param($stmt, 'i', $id);
     mysqli_stmt_execute($stmt);
-    header('Location: message.php');
+    header('Location: message.php?notif=hapus_sukses');
     exit;
 }
 

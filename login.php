@@ -98,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - Lumoo Coffee</title>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Nunito:wght@400;600;700;800;900&family=Permanent+Marker&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -137,5 +138,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 
   <script src="app.js?v=<?php echo time(); ?>" defer></script>
+  <?php if (!empty($error)): ?>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal Login',
+          text: <?php echo json_encode($error); ?>,
+          confirmButtonColor: '#dc2626',
+          confirmButtonText: 'Coba Lagi'
+        });
+      }
+    });
+  </script>
+  <?php endif; ?>
 </body>
 </html>
