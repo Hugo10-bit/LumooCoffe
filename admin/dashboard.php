@@ -2,13 +2,8 @@
 include 'session.php'; 
 
 // Fetch statistics
-$prod_query = mysqli_query($conn, "SELECT COUNT(*) as total FROM tb_product");
-$prod_data = mysqli_fetch_assoc($prod_query);
-$total_products = $prod_data['total'];
-
-$cat_query = mysqli_query($conn, "SELECT COUNT(*) as total FROM tb_category");
-$cat_data = mysqli_fetch_assoc($cat_query);
-$total_categories = $cat_data['total'];
+$total_products = get_app_total_products($conn);
+$total_categories = count(get_app_categories($conn));
 ?>
 <html lang="en">
 <head>

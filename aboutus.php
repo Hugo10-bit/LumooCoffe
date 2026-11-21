@@ -250,7 +250,7 @@
 
   <!-- stats -->
   <section class="stats-row">
-    <?php $total_produk = $conn ? (int) mysqli_fetch_row(mysqli_query($conn, "SELECT COUNT(*) FROM tb_product WHERE product_status = 1"))[0] : 18; ?>
+    <?php $total_produk = get_app_total_products($conn); ?>
     <div class="stat"><h3><?php echo $total_produk; ?></h3><p>Available Products</p></div>
     <div class="stat"><h3>2023</h3><p>Established</p></div>
     <div class="stat"><h3>300+</h3><p>Happy Customers</p></div>
@@ -280,14 +280,11 @@
           <h4>Menus</h4>
           <ul>
             <?php 
-              // 1. Ambil seluruh data kategori dari database untuk dijadikan menu link otomatis di footer
-              $ft_kategori = $conn ? mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC") : false;
-              
-              // 2. Jika datanya ada (> 0), tampilkan satu per satu sebagai link tujuan (href)
-              if($ft_kategori && mysqli_num_rows($ft_kategori) > 0){
-                while($fk = mysqli_fetch_array($ft_kategori)){
+              $ft_kategori = get_app_categories($conn);
+              if(!empty($ft_kategori)){
+                foreach($ft_kategori as $fk){
             ?>
-              <li><a href="ourmenu.php?kat=<?php echo $fk['category_id'] ?>"><?php echo $fk['category_name'] ?></a></li>
+              <li><a href="ourmenu.php?kat=<?php echo $fk['category_id'] ?>"><?php echo htmlspecialchars($fk['category_name']) ?></a></li>
             <?php } } ?>
           </ul>
         </div>

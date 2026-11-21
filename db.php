@@ -59,3 +59,5 @@
         $conn = false;
         $db_error = $e->getMessage();
     }
+
+    require_once __DIR__ . '/data.php';

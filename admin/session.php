@@ -18,15 +18,28 @@ if (empty($_SESSION['status_login']) || empty($_SESSION['id_login']) || ($_SESSI
 
 $session_id = (int) $_SESSION['id_login'];
 
-$stmt = mysqli_prepare($conn, "SELECT * FROM tb_admin WHERE admin_id = ? AND level = 'admin' LIMIT 1");
-mysqli_stmt_bind_param($stmt, 'i', $session_id);
-mysqli_stmt_execute($stmt);
-$user_row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+if ($conn) {
+    $stmt = mysqli_prepare($conn, "SELECT * FROM tb_admin WHERE admin_id = ? AND level = 'admin' LIMIT 1");
+    mysqli_stmt_bind_param($stmt, 'i', $session_id);
+    mysqli_stmt_execute($stmt);
+    $user_row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-// Akun sudah dihapus / level berubah: paksa login ulang
-if (!$user_row) {
-    $_SESSION = [];
-    session_destroy();
-    header('Location: ../login.php?pesan=login');
-    exit;
+    // Akun sudah dihapus / level berubah: paksa login ulang
+    if (!$user_row) {
+        $_SESSION = [];
+        session_destroy();
+        header('Location: ../login.php?pesan=login');
+        exit;
+    }
+} else {
+    $user_row = [
+        'admin_id' => $session_id,
+        'nama' => $_SESSION['nama'] ?? 'LumooCoffe',
+        'admin_name' => $_SESSION['nama'] ?? 'LumooCoffe',
+        'username' => 'LumooCoffe',
+        'level' => 'admin',
+        'email' => 'lumoo_coffee@gmail.com',
+        'telpon' => '081234567890',
+        'alamat' => 'Lumoo Coffee'
+    ];
 }

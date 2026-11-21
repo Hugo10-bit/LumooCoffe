@@ -2,11 +2,7 @@
   // 1. Sertakan file session.php untuk memastikan hanya user yang sudah login yang bisa membuka halaman ini
   include 'session.php';
   
-  // 2. Ambil maksimal 4 produk terlaris dari database untuk ditampilkan di halaman utama
-  $produk_bestseller = mysqli_query($conn, "SELECT * FROM tb_product
-    WHERE product_status = 1 AND is_bestseller > 0
-    ORDER BY is_bestseller DESC
-    LIMIT 4");
+  $produk_bestseller = get_app_bestsellers($conn, 4);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -101,17 +97,17 @@
   <section class="bestseller" id="menu">
     <h2 class="bs-title">BEST SELLER</h2>
     <div class="product-grid">
-      <?php if(mysqli_num_rows($produk_bestseller) > 0){
-          while($p = mysqli_fetch_array($produk_bestseller)){
+      <?php if(!empty($produk_bestseller)){
+          foreach($produk_bestseller as $p){
             $description = str_ireplace("Chiken wings", "Chicken wings", $p['product_description']);
       ?>
           <div class="product-card">
             <div class="p-img">
-              <img src="../produk/<?php echo $p['product_image'] ?>" alt="<?php echo $p['product_name'] ?>" style="width: 100%; height: 100%; object-fit: cover;">
+              <img src="../produk/<?php echo htmlspecialchars($p['product_image']) ?>" alt="<?php echo htmlspecialchars($p['product_name']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div class="p-info">
-              <h3 class="p-name"><?php echo $p['product_name'] ?></h3>
-              <p class="p-desc"><?php echo $description; ?></p>
+              <h3 class="p-name"><?php echo htmlspecialchars($p['product_name']) ?></h3>
+              <p class="p-desc"><?php echo htmlspecialchars($description); ?></p>
               <div class="p-price-row">
                 <span class="p-price"><?php echo number_format($p['product_price'], 0, ',', '.') ?></span>
               </div>
@@ -151,14 +147,12 @@
           <h4>Menus</h4>
           <ul>
             <?php
-              // 4. Ambil seluruh data kategori dari database untuk dijadikan menu link otomatis di footer
-              $ft_kategori = mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC");
-              
-              // 5. Keluarkan satu per satu sebagai link
-              while($fk = mysqli_fetch_array($ft_kategori)){
+              $ft_kategori = get_app_categories($conn);
+              if(!empty($ft_kategori)){
+                foreach($ft_kategori as $fk){
             ?>
-              <li><a href="ourmenu_user.php?kat=<?php echo $fk['category_id'] ?>"><?php echo $fk['category_name'] ?></a></li>
-            <?php } ?>
+              <li><a href="ourmenu_user.php?kat=<?php echo $fk['category_id'] ?>"><?php echo htmlspecialchars($fk['category_name']) ?></a></li>
+            <?php } } ?>
           </ul>
         </div>
       </div>

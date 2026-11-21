@@ -29,12 +29,29 @@ if ($pesan === 'login')      $notice = 'Please log in first to continue.';
 if ($pesan === 'registered') $notice = 'Registration successful. Please log in.';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!$conn) {
-        $error = 'Database is currently offline. Please configure DB credentials.';
-    } else {
-        $username = trim($_POST['user'] ?? '');
-        $password = $_POST['pass'] ?? '';
+    $username = trim($_POST['user'] ?? '');
+    $password = $_POST['pass'] ?? '';
 
+    if (!$conn) {
+        // Fallback login saat database cloud belum dihubungkan (mode demo/preview)
+        if ($username === 'LumooCoffe' && $password === 'lumo10') {
+            session_regenerate_id(true);
+            $_SESSION['id_login']     = 3;
+            $_SESSION['level']        = 'admin';
+            $_SESSION['status_login'] = true;
+            $_SESSION['nama']         = 'LumooCoffe';
+            redirect_by_level('admin');
+        } elseif ($username === 'user' && $password === '123') {
+            session_regenerate_id(true);
+            $_SESSION['id_login']     = 5;
+            $_SESSION['level']        = 'pelanggan';
+            $_SESSION['status_login'] = true;
+            $_SESSION['nama']         = 'User';
+            redirect_by_level('pelanggan');
+        } else {
+            $error = 'Incorrect username or password.';
+        }
+    } else {
         $stmt = mysqli_prepare($conn, "SELECT * FROM tb_admin WHERE username = ? LIMIT 1");
         mysqli_stmt_bind_param($stmt, 's', $username);
         mysqli_stmt_execute($stmt);

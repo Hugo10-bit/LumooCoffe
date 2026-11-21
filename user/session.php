@@ -21,22 +21,34 @@ if (empty($_SESSION['status_login']) || empty($_SESSION['id_login'])) {
 // 5. Ambil data lengkap pengguna dari database
 $session_id = (int) $_SESSION['id_login'];
 
-$stmt = mysqli_prepare($conn, "SELECT * FROM tb_admin WHERE admin_id = ? LIMIT 1");
-mysqli_stmt_bind_param($stmt, 'i', $session_id);
-mysqli_stmt_execute($stmt);
-$user_row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+if ($conn) {
+    $stmt = mysqli_prepare($conn, "SELECT * FROM tb_admin WHERE admin_id = ? LIMIT 1");
+    mysqli_stmt_bind_param($stmt, 'i', $session_id);
+    mysqli_stmt_execute($stmt);
+    $user_row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-// 6. Akun sudah tidak ada: paksa login ulang
-if (!$user_row) {
-    $_SESSION = [];
-    session_destroy();
-    header('Location: ../login.php?pesan=login');
-    exit;
+    // 6. Akun sudah tidak ada: paksa login ulang
+    if (!$user_row) {
+        $_SESSION = [];
+        session_destroy();
+        header('Location: ../login.php?pesan=login');
+        exit;
+    }
+
+    // Jika nama kosong, fallback ke username
+    if (empty($user_row['nama'])) {
+        $user_row['nama'] = $user_row['username'];
+    }
+
+    $_SESSION['nama'] = $user_row['nama'];
+} else {
+    $user_row = [
+        'admin_id' => $session_id,
+        'nama' => $_SESSION['nama'] ?? 'User',
+        'username' => 'user',
+        'level' => 'pelanggan',
+        'email' => 'user@gmail.com',
+        'telpon' => '12345678',
+        'alamat' => 'SMK Telkom Banjarbaru'
+    ];
 }
-
-// Jika nama kosong, fallback ke username
-if (empty($user_row['nama'])) {
-    $user_row['nama'] = $user_row['username'];
-}
-
-$_SESSION['nama'] = $user_row['nama'];

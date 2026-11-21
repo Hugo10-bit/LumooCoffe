@@ -352,12 +352,12 @@
     <div class="filters" id="filter-bar">
       <button class="filter-btn active" data-cat="all">All</button>
       <?php 
-        $categories = $conn ? mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC") : false;
-        if($categories && mysqli_num_rows($categories) > 0){
-          while($c = mysqli_fetch_array($categories)){
+        $categories = get_app_categories($conn);
+        if(!empty($categories)){
+          foreach($categories as $c){
       ?>
         <button class="filter-btn" data-cat="<?php echo $c['category_id'] ?>">
-          <?php echo $c['category_name'] ?>
+          <?php echo htmlspecialchars($c['category_name']) ?>
         </button>
       <?php } } ?>
     </div>
@@ -369,31 +369,27 @@
       <h2 class="section-title">Our Menus</h2>
       <div class="menu-grid">
         <?php 
-          // 2. Ambil semua data produk yang statusnya aktif (1), gabungkan sekalian dengan nama kategorinya
-          $products = $conn ? mysqli_query($conn, "SELECT * FROM tb_product LEFT JOIN tb_category USING (category_id) WHERE product_status = 1 ORDER BY product_id DESC") : false;
-          
-          // 3. Cek apakah ada produk yang tersedia?
-          if($products && mysqli_num_rows($products) > 0){
+          $products = get_app_products($conn);
+          if(!empty($products)){
             $delay = 0;
-            // 4. Keluarkan datanya satu per satu untuk dijadikan kartu-kartu menu
-            while($p = mysqli_fetch_array($products)){
+            foreach($products as $p){
         ?>
             <article class="menu-card" 
               data-category="<?php echo $p['category_id'] ?>"
               style="animation-delay: <?php echo $delay * 0.07 ?>s">
               <div class="menu-card-img">
                 <?php if(!empty($p['product_image'])): ?>
-                  <img src="produk/<?php echo $p['product_image'] ?>" alt="<?php echo $p['product_name'] ?>">
+                  <img src="produk/<?php echo htmlspecialchars($p['product_image']) ?>" alt="<?php echo htmlspecialchars($p['product_name']) ?>">
                 <?php else: ?>
-                  <img src="img/menu.jpeg" alt="<?php echo $p['product_name'] ?>">
+                  <img src="img/menu.jpeg" alt="<?php echo htmlspecialchars($p['product_name']) ?>">
                 <?php endif; ?>
               </div>
               <div class="menu-card-body">
-                <h3><?php echo $p['product_name'] ?></h3>
-                <p class="card-desc"><?php echo $p['product_description'] ?></p>
+                <h3><?php echo htmlspecialchars($p['product_name']) ?></h3>
+                <p class="card-desc"><?php echo htmlspecialchars($p['product_description']) ?></p>
                 <div class="menu-card-bottom">
                   <span class="menu-card-price"><?php echo number_format($p['product_price'], 0, ',', '.') ?></span>
-                  <span class="menu-card-tag"><?php echo $p['category_name'] ?></span>
+                  <span class="menu-card-tag"><?php echo htmlspecialchars($p['category_name'] ?? '') ?></span>
                 </div>
               </div>
             </article>
@@ -477,14 +473,11 @@
           <h4>Menus</h4>
           <ul>
             <?php 
-              // 1. Ambil seluruh data kategori dari database untuk dijadikan menu link otomatis di footer
-              $ft_kategori = $conn ? mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC") : false;
-              
-              // 2. Jika datanya ada (> 0), tampilkan satu per satu sebagai link tujuan (href)
-              if($ft_kategori && mysqli_num_rows($ft_kategori) > 0){
-                while($fk = mysqli_fetch_array($ft_kategori)){
+              $ft_kategori = get_app_categories($conn);
+              if(!empty($ft_kategori)){
+                foreach($ft_kategori as $fk){
             ?>
-              <li><a href="ourmenu.php?kat=<?php echo $fk['category_id'] ?>"><?php echo $fk['category_name'] ?></a></li>
+              <li><a href="ourmenu.php?kat=<?php echo $fk['category_id'] ?>"><?php echo htmlspecialchars($fk['category_name']) ?></a></li>
             <?php } } ?>
           </ul>
         </div>
