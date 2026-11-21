@@ -61,3 +61,8 @@
     }
 
     require_once __DIR__ . '/data.php';
+    require_once __DIR__ . '/session_helper.php';
+
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        lumoo_restore_auth_session();
+    }

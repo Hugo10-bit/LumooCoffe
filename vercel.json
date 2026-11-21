@@ -8,11 +8,11 @@
   },
   "routes": [
     {
-      "src": "/(style\\.css|app\\.js|fix_data\\.sql)",
+      "src": "/(style\\.css|app\\.js|favicon\\.ico)",
       "dest": "/$1"
     },
     {
-      "src": "/(img|location_img|produk|admin)/(.*)",
+      "src": "/(img|location_img|produk|admin)/(.*\\.(css|png|jpg|jpeg|gif|svg|ico|webp|js|woff|woff2|ttf|eot))",
       "dest": "/$1/$2"
     },
     {

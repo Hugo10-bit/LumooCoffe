@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['level']        = 'admin';
             $_SESSION['status_login'] = true;
             $_SESSION['nama']         = 'LumooCoffe';
+            lumoo_save_auth_cookie(3, 'admin', 'LumooCoffe');
             redirect_by_level('admin');
         } elseif ($username === 'user' && $password === '123') {
             session_regenerate_id(true);
@@ -47,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['level']        = 'pelanggan';
             $_SESSION['status_login'] = true;
             $_SESSION['nama']         = 'User';
+            lumoo_save_auth_cookie(5, 'pelanggan', 'User');
             redirect_by_level('pelanggan');
         } else {
             $error = 'Incorrect username or password.';
@@ -80,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['level']        = $row['level'];
             $_SESSION['status_login'] = true;
             $_SESSION['nama']         = $row['nama'];
+            lumoo_save_auth_cookie($row['admin_id'], $row['level'], $row['nama']);
             redirect_by_level($row['level']);
         }
 
