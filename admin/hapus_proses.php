@@ -2,6 +2,11 @@
 // Wajib login sebagai admin sebelum bisa menghapus data
 include 'session.php';
 
+if (!$conn) {
+    echo '<script>alert("Notice: Database cloud belum terhubung. Penghapusan data tidak dapat diproses dalam mode demo."); window.history.back();</script>';
+    exit;
+}
+
 // 1. Hapus kategori
 if (isset($_GET['idk'])) {
     $id = (int) $_GET['idk'];
@@ -24,7 +29,7 @@ if (isset($_GET['idp'])) {
     if ($p && $p['product_image'] !== '') {
         $file = __DIR__ . '/../produk/' . basename($p['product_image']);
         if (is_file($file)) {
-            unlink($file);
+            @unlink($file);
         }
     }
 

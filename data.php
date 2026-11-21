@@ -209,6 +209,34 @@ $DEFAULT_PRODUCTS = [
     ]
 ];
 
+// Default messages for demo / fallback when database is not connected
+$DEFAULT_MESSAGES = [
+    [
+        'id' => 1,
+        'nama' => 'Dimas Pratama',
+        'email' => 'dimas.pratama@gmail.com',
+        'telepon' => '081298765432',
+        'pesan' => 'Kopi Lumo Latte rasanya mantap banget! Apakah ada promo atau voucher membership bulanan untuk mahasiswa?',
+        'created_at' => '2026-11-20 14:32:00'
+    ],
+    [
+        'id' => 2,
+        'nama' => 'Siti Rahmawati',
+        'email' => 'siti.rahma@yahoo.com',
+        'telepon' => '082155443322',
+        'pesan' => 'Halo min, untuk Dubai Chewy Cookie apakah ready stock setiap hari di outlet Malang? Mau pesan untuk acara kantor.',
+        'created_at' => '2026-11-21 09:15:00'
+    ],
+    [
+        'id' => 3,
+        'nama' => 'Kevin Alexander',
+        'email' => 'kevin.alex@outlook.com',
+        'telepon' => '087811223344',
+        'pesan' => 'Tempatnya cozy dan wifi kencang. Saran untuk menu Matcha Glow bisa ditambah pilihan less sweet.',
+        'created_at' => '2026-11-21 16:45:00'
+    ]
+];
+
 function get_app_categories($conn) {
     global $DEFAULT_CATEGORIES;
     if ($conn) {
@@ -268,4 +296,67 @@ function get_app_total_products($conn) {
         }
     }
     return count($DEFAULT_PRODUCTS);
+}
+
+function get_admin_categories($conn) {
+    global $DEFAULT_CATEGORIES;
+    if ($conn) {
+        $res = @mysqli_query($conn, "SELECT * FROM tb_category ORDER BY category_id DESC");
+        if ($res && mysqli_num_rows($res) > 0) {
+            $list = [];
+            while ($row = mysqli_fetch_assoc($res)) {
+                $list[] = $row;
+            }
+            return $list;
+        }
+    }
+    return $DEFAULT_CATEGORIES;
+}
+
+function get_admin_products($conn) {
+    global $DEFAULT_PRODUCTS;
+    if ($conn) {
+        $res = @mysqli_query($conn, "SELECT * FROM tb_product LEFT JOIN tb_category USING (category_id) ORDER BY product_id DESC");
+        if ($res && mysqli_num_rows($res) > 0) {
+            $list = [];
+            while ($row = mysqli_fetch_assoc($res)) {
+                $list[] = $row;
+            }
+            return $list;
+        }
+    }
+    return $DEFAULT_PRODUCTS;
+}
+
+function get_admin_messages($conn) {
+    global $DEFAULT_MESSAGES;
+    if ($conn) {
+        $res = @mysqli_query($conn, "SELECT * FROM tb_message ORDER BY id DESC");
+        if ($res && mysqli_num_rows($res) > 0) {
+            $list = [];
+            while ($row = mysqli_fetch_assoc($res)) {
+                $list[] = $row;
+            }
+            return $list;
+        }
+    }
+    return $DEFAULT_MESSAGES;
+}
+
+function get_admin_bestseller_count($conn) {
+    global $DEFAULT_PRODUCTS;
+    if ($conn) {
+        $res = @mysqli_query($conn, "SELECT COUNT(*) FROM tb_product WHERE is_bestseller = 1");
+        if ($res) {
+            $row = mysqli_fetch_row($res);
+            return (int)$row[0];
+        }
+    }
+    $count = 0;
+    foreach ($DEFAULT_PRODUCTS as $p) {
+        if (!empty($p['is_bestseller'])) {
+            $count++;
+        }
+    }
+    return $count;
 }
