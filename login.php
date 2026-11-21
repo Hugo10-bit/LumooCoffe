@@ -29,41 +29,45 @@ if ($pesan === 'login')      $notice = 'Please log in first to continue.';
 if ($pesan === 'registered') $notice = 'Registration successful. Please log in.';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['user'] ?? '');
-    $password = $_POST['pass'] ?? '';
+    if (!$conn) {
+        $error = 'Database is currently offline. Please configure DB credentials.';
+    } else {
+        $username = trim($_POST['user'] ?? '');
+        $password = $_POST['pass'] ?? '';
 
-    $stmt = mysqli_prepare($conn, "SELECT * FROM tb_admin WHERE username = ? LIMIT 1");
-    mysqli_stmt_bind_param($stmt, 's', $username);
-    mysqli_stmt_execute($stmt);
-    $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+        $stmt = mysqli_prepare($conn, "SELECT * FROM tb_admin WHERE username = ? LIMIT 1");
+        mysqli_stmt_bind_param($stmt, 's', $username);
+        mysqli_stmt_execute($stmt);
+        $row = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-    $valid = false;
-    if ($row) {
-        $stored = $row['password'];
-        $isHash = !empty(password_get_info($stored)['algo']);
+        $valid = false;
+        if ($row) {
+            $stored = $row['password'];
+            $isHash = !empty(password_get_info($stored)['algo']);
 
-        if ($isHash && password_verify($password, $stored)) {
-            $valid = true;
-        } elseif (!$isHash && hash_equals($stored, $password)) {
-            // Password lama masih teks biasa: terima sekali, lalu langsung diubah jadi hash
-            $valid = true;
-            $newHash = password_hash($password, PASSWORD_DEFAULT);
-            $up = mysqli_prepare($conn, "UPDATE tb_admin SET password = ? WHERE admin_id = ?");
-            mysqli_stmt_bind_param($up, 'si', $newHash, $row['admin_id']);
-            mysqli_stmt_execute($up);
+            if ($isHash && password_verify($password, $stored)) {
+                $valid = true;
+            } elseif (!$isHash && hash_equals($stored, $password)) {
+                // Password lama masih teks biasa: terima sekali, lalu langsung diubah jadi hash
+                $valid = true;
+                $newHash = password_hash($password, PASSWORD_DEFAULT);
+                $up = mysqli_prepare($conn, "UPDATE tb_admin SET password = ? WHERE admin_id = ?");
+                mysqli_stmt_bind_param($up, 'si', $newHash, $row['admin_id']);
+                mysqli_stmt_execute($up);
+            }
         }
-    }
 
-    if ($valid) {
-        session_regenerate_id(true);
-        $_SESSION['id_login']     = $row['admin_id'];
-        $_SESSION['level']        = $row['level'];
-        $_SESSION['status_login'] = true;
-        $_SESSION['nama']         = $row['nama'];
-        redirect_by_level($row['level']);
-    }
+        if ($valid) {
+            session_regenerate_id(true);
+            $_SESSION['id_login']     = $row['admin_id'];
+            $_SESSION['level']        = $row['level'];
+            $_SESSION['status_login'] = true;
+            $_SESSION['nama']         = $row['nama'];
+            redirect_by_level($row['level']);
+        }
 
-    $error = 'Incorrect username or password.';
+        $error = 'Incorrect username or password.';
+    }
 }
 ?>
 <!DOCTYPE html>

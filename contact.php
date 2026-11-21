@@ -55,8 +55,10 @@
         </div>
 
         <?php
-          $admin = mysqli_query($conn, "SELECT * FROM tb_admin WHERE level = 'admin' ORDER BY admin_id ASC LIMIT 1");
-          $a = mysqli_fetch_object($admin);
+          $admin = $conn ? mysqli_query($conn, "SELECT * FROM tb_admin WHERE level = 'admin' ORDER BY admin_id ASC LIMIT 1") : false;
+          $a = ($admin && mysqli_num_rows($admin) > 0) ? mysqli_fetch_object($admin) : null;
+          $adminEmail = $a ? htmlspecialchars($a->email) : 'lumoo_coffee@gmail.com';
+          $adminTelpon = $a ? htmlspecialchars($a->telpon) : '081234567890';
         ?>
 
         <div class="contact-card">
@@ -65,7 +67,7 @@
           </div>
           <div>
             <p class="contact-label">Email</p>
-            <p class="contact-detail"><?php echo $a->email ?></p>
+            <p class="contact-detail"><?php echo $adminEmail; ?></p>
           </div>
         </div>
 
@@ -75,7 +77,7 @@
           </div>
           <div>
             <p class="contact-label">Telephone/WhatsApp</p>
-            <p class="contact-detail"><?php echo $a->telpon ?></p>
+            <p class="contact-detail"><?php echo $adminTelpon; ?></p>
           </div>
         </div>
 

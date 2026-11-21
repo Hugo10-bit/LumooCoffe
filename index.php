@@ -2,15 +2,15 @@
   include 'db.php';
 
   // Ambil kategori
-  $kategori = mysqli_query($conn, "SELECT * FROM tb_category ORDER BY category_id DESC");
+  $kategori = $conn ? mysqli_query($conn, "SELECT * FROM tb_category ORDER BY category_id DESC") : false;
 
   // Ambil produk bestseller (desc)
-  $produk_bestseller = mysqli_query($conn, "
+  $produk_bestseller = $conn ? mysqli_query($conn, "
     SELECT * FROM tb_product
     WHERE product_status = 1 AND is_bestseller > 0
     ORDER BY is_bestseller DESC
     LIMIT 4
-  ");
+  ") : false;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -87,7 +87,7 @@
   <section class="bestseller" id="menu">
     <h2 class="bs-title">BEST SELLER</h2>
     <div class="product-grid">
-      <?php if (mysqli_num_rows($produk_bestseller) > 0): ?>
+      <?php if ($produk_bestseller && mysqli_num_rows($produk_bestseller) > 0): ?>
         <?php while ($p = mysqli_fetch_array($produk_bestseller)): ?>
           <?php
             // Memperbaiki typo "Chiken" menjadi "Chicken" secara otomatis
@@ -107,7 +107,7 @@
           </div>
         <?php endwhile; ?>
       <?php else: ?>
-        <p style="text-align:center;width:100%;color:white;">No products available.</p>
+        <p style="text-align:center;width:100%;color:white;grid-column:1/-1;">No products available at the moment.</p>
       <?php endif; ?>
     </div>
     <a href="ourmenu.php" class="load-btn">View All Menu</a>
@@ -144,10 +144,10 @@
           <ul>
             <?php 
               // 1. Ambil seluruh data kategori dari database untuk dijadikan menu link otomatis di footer
-              $ft_kategori = mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC");
+              $ft_kategori = $conn ? mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC") : false;
               
               // 2. Jika datanya ada (> 0), tampilkan satu per satu sebagai link tujuan (href)
-              if(mysqli_num_rows($ft_kategori) > 0){
+              if($ft_kategori && mysqli_num_rows($ft_kategori) > 0){
                 while($fk = mysqli_fetch_array($ft_kategori)){
             ?>
               <li><a href="ourmenu.php?kat=<?php echo $fk['category_id'] ?>"><?php echo $fk['category_name'] ?></a></li>

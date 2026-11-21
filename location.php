@@ -121,10 +121,10 @@
           <ul>
             <?php 
               // 1. Ambil seluruh data kategori dari database untuk dijadikan menu link otomatis di footer
-              $ft_kategori = mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC");
+              $ft_kategori = $conn ? mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC") : false;
               
               // 2. Jika datanya ada (> 0), tampilkan satu per satu sebagai link tujuan (href)
-              if(mysqli_num_rows($ft_kategori) > 0){
+              if($ft_kategori && mysqli_num_rows($ft_kategori) > 0){
                 while($fk = mysqli_fetch_array($ft_kategori)){
             ?>
               <li><a href="ourmenu.php?kat=<?php echo $fk['category_id'] ?>"><?php echo $fk['category_name'] ?></a></li>

@@ -352,13 +352,14 @@
     <div class="filters" id="filter-bar">
       <button class="filter-btn active" data-cat="all">All</button>
       <?php 
-        $categories = mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC");
-        while($c = mysqli_fetch_array($categories)){
+        $categories = $conn ? mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC") : false;
+        if($categories && mysqli_num_rows($categories) > 0){
+          while($c = mysqli_fetch_array($categories)){
       ?>
         <button class="filter-btn" data-cat="<?php echo $c['category_id'] ?>">
           <?php echo $c['category_name'] ?>
         </button>
-      <?php } ?>
+      <?php } } ?>
     </div>
   </div>
 
@@ -369,10 +370,10 @@
       <div class="menu-grid">
         <?php 
           // 2. Ambil semua data produk yang statusnya aktif (1), gabungkan sekalian dengan nama kategorinya
-          $products = mysqli_query($conn, "SELECT * FROM tb_product LEFT JOIN tb_category USING (category_id) WHERE product_status = 1 ORDER BY product_id DESC");
+          $products = $conn ? mysqli_query($conn, "SELECT * FROM tb_product LEFT JOIN tb_category USING (category_id) WHERE product_status = 1 ORDER BY product_id DESC") : false;
           
           // 3. Cek apakah ada produk yang tersedia?
-          if(mysqli_num_rows($products) > 0){
+          if($products && mysqli_num_rows($products) > 0){
             $delay = 0;
             // 4. Keluarkan datanya satu per satu untuk dijadikan kartu-kartu menu
             while($p = mysqli_fetch_array($products)){
@@ -477,10 +478,10 @@
           <ul>
             <?php 
               // 1. Ambil seluruh data kategori dari database untuk dijadikan menu link otomatis di footer
-              $ft_kategori = mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC");
+              $ft_kategori = $conn ? mysqli_query($conn, "SELECT * FROM tb_category ORDER BY FIELD(category_name, 'Coffee', 'Non Coffee', 'Sweet', 'Light') ASC, category_id ASC") : false;
               
               // 2. Jika datanya ada (> 0), tampilkan satu per satu sebagai link tujuan (href)
-              if(mysqli_num_rows($ft_kategori) > 0){
+              if($ft_kategori && mysqli_num_rows($ft_kategori) > 0){
                 while($fk = mysqli_fetch_array($ft_kategori)){
             ?>
               <li><a href="ourmenu.php?kat=<?php echo $fk['category_id'] ?>"><?php echo $fk['category_name'] ?></a></li>
