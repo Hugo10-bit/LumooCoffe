@@ -1,0 +1,6 @@
+<li><a href="dashboard.php"><img src="../img/icon-dashboard.png" alt="Dashboard" style="width: 36px; margin-right: 12px; vertical-align: middle;"> Dashboard</a></li>
+<li><a href="profile.php"><img src="../img/icon-profile.png" alt="Profile" style="width: 36px; margin-right: 12px; vertical-align: middle;"> Profile</a></li>
+<li><a href="kategori_data.php"><img src="../img/icon-categories.png" alt="Categories" style="width: 36px; margin-right: 12px; vertical-align: middle;"> Categories</a></li>
+<li><a href="produk_data.php"><img src="../img/icon-products.png" alt="Products" style="width: 36px; margin-right: 12px; vertical-align: middle;"> Products</a></li>
+<li><a href="message.php"><img src="../img/icon-message.png" alt="Message" style="width: 36px; margin-right: 12px; vertical-align: middle;"> Message</a></li>
+<li><a href="../logout.php" onclick="return confirm ('Are you sure you want to logout?')"><img src="../img/icon-logout.png" alt="Logout" style="width: 36px; margin-right: 12px; vertical-align: middle;"> Logout</a></li>
